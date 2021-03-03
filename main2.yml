@@ -7,7 +7,12 @@ name: CI to Docker Hub
 on:
   #当主分支push时候触发
   push:
+    #指定分支
     branches: [ master ]
+    #指定特定版本时触发，如 git tag -a v1.0.2，  git push origin v1.0.2
+    tags:
+      - "v*.*.*"
+
 
 
 
@@ -24,6 +29,13 @@ jobs:
         #自动从网上下载
         uses: actions/checkout@v2
 
+
+      #设置docker 构建器
+      - name: Set up Docker Buildx
+        id: buildx
+        #自动从网上下载
+        uses: docker/setup-buildx-action@v1
+
       #登录dockerhub
       - name: Login to Docker Hub
         #自动从网上下载
@@ -32,11 +44,6 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_DOCKERID }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      #设置docker 构建器
-      - name: Set up Docker Buildx
-        id: buildx
-        #自动从网上下载
-        uses: docker/setup-buildx-action@v1
 
       #构建和发布
       - name: Build and push

@@ -131,7 +131,7 @@ CICD
     5. 设置github actions workflow
 
         进入你的项目仓库，点击Actions(这里不是settings里的actions) > New workflow.
-        需要些一个 yml文件配置工作流
+        github 生成一个 yml文件（用于配置工作流），写完后，提交到项目中，此文件会存放在.github/workflows目录中
 
     6. 设置完workflow之后，可以执行命令git push， 然后可以看到github的actions里面有新生成的workflow
 
