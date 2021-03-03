@@ -116,6 +116,8 @@ CICD
             注意：token生产后，一定要找地方保存下来。dockerhub只展示一次，否则会丢失
 
 
+            我自己的token   050c59d4-1639-4ad9-a987-1c29f8b1a9d3
+
     3.将自己的项目放入github上
 
     4.github 与 dockerhub 关联
@@ -129,9 +131,21 @@ CICD
     5. 设置github actions workflow
 
         进入你的项目仓库，点击Actions(这里不是settings里的actions) > New workflow.
-
         需要些一个 yml文件配置工作流
 
-         docker login --username rancheng
-         050c59d4-1639-4ad9-a987-1c29f8b1a9d3
+    6. 设置完workflow之后，可以执行命令git push， 然后可以看到github的actions里面有新生成的workflow
+
+
+
+
+        docker login --username rancheng
+
+
+        docker tag 3bd2787b9fa3 a1030907690/ubuntu:latest
+
+        docker tag ea-docker:latest ea-docker:v1.0.0
+
+        docker push jwzg/ea-image
+
+        docker buildx build --tag rancheng/ea-image:latest --iidfile /tmp/docker-build-push-tL9z1z/iidfile --file ./Dockerfile --push ./
 
