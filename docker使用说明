@@ -138,14 +138,16 @@ CICD
 
 
 
-        docker login --username rancheng
 
 
-        docker tag 3bd2787b9fa3 a1030907690/ubuntu:latest
 
-        docker tag ea-docker:latest ea-docker:v1.0.0
+正常的 build,push 全流程
+        docker build --tag ea-image:latest  .
 
-        docker push jwzg/ea-image
+        #push 之前先打个新标签
+        docker tag ea-image:latest  rancheng/ea-image:latest
 
-        docker buildx build --tag rancheng/ea-image:latest --iidfile /tmp/docker-build-push-tL9z1z/iidfile --file ./Dockerfile --push ./
+        #push之前，先登录。防止报错denied: requested access to the resource is denied
+        docker login --username rancheng --password 159307
 
+        docker push rancheng/ea-image:latest
