@@ -110,5 +110,29 @@
 
 
 CICD
-    1.注册dockerhub 账号，拿到dockerID
-    2.
+    1.注册dockerhub 账号，拿到dockerID       （相当于dockerhub 用户名）
+    2.在dockerhub 创建Personal Access Token （相当于dockerhub 密码的另一种更安全形式，当登录dockerhub时会用到）
+            进入https://hub.docker.com/settings/security，然后点击New Access Token.
+            注意：token生产后，一定要找地方保存下来。dockerhub只展示一次，否则会丢失
+
+
+            docker login --username rancheng
+            050c59d4-1639-4ad9-a987-1c29f8b1a9d3
+
+
+    3.将自己的项目放入github上
+
+    4.github 与 dockerhub 关联
+
+        添加dockerID和token 到github项目中(相当于把dockerhub 的用户名和密码 放入了github上)
+        进入你的项目仓库，点击Settings > Secrets > New secret.（创建两个secret,分别存放dockerID和token）
+
+        详见 ./github secret.jpeg
+
+
+    5. 设置github actions workflow
+
+        进入你的项目仓库，点击Actions(这里不是settings里的actions) > New workflow.
+
+        需要些一个 yml文件配置工作流
+
