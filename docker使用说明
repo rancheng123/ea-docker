@@ -136,7 +136,10 @@ CICD
     6. 设置完workflow之后，可以执行命令git push， 然后可以看到github的actions里面有新生成的workflow
 
 
+    7. 未读完的
+        https://docs.docker.com/language/nodejs/configure-ci-cd/
 
+            Now, let’s set up a second GitHub action file to store our latest commit as an image in the GitHub registry. You may want to do this to
 
 
 
