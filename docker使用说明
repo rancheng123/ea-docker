@@ -1,0 +1,114 @@
+服务器在loop 中运行，等待可能来的请求
+
+
+
+镜像
+    1.创建dockerfile，写入命令（参考Dockerfile 文件）
+
+    2.构建镜像 （一个镜像由manifest 和一系列的层 组成）
+      代码有改动，需要重新构建镜像
+        #--tag ea-docker  给镜像起名字
+        #--target test  指定构建阶段（dockerfile 内部可以写多个阶段）
+
+        docker build --tag ea-docker .
+
+    3.查看新生成的镜像
+        docker images
+
+    4.给镜像打tag （打第二个tag，一个镜像可以有多个tag）
+        docker tag ea-docker:latest ea-docker:v1.0.0
+
+    5.删除镜像(如果有多个tag,只是删除了其中一个tag的引用，没有真正删除镜像)
+        docker rmi ea-docker:v1.0.0
+容器
+    6.启动容器,镜像在容器中运行。(本地无此镜像，先pull,再 run)
+
+        #--detach or -d （与terminal解绑，以后台模式运行， 将terminal 控制权交给你）
+        #--publish 8000:8000  形成端口映射
+        #--name ea-container 给容器起个名字
+        #--network mongodb  指定网络
+        #-e CONNECTIONSTRING=mongodb://mongodb:27017/yoda_notes  指定环境变量
+        #-it  交互式和打开终端
+        #--rm  ???
+
+
+        docker run -detach --publish 8000:8000 --name ea-container ea-docker
+
+    6.重启容器（容器名称，容器id）
+        docker restart ea-container
+
+    7.查看容器（默认只展示运行中的）
+
+        #--all or -a  查看全部容器（包括运行中的和停止的）
+
+        docker ps
+
+    8.停止容器,但未删除（容器id, 容器名字）
+        docker stop ea-container
+
+    9.删除容器(可以删除多个容器)
+        docker rm ea-container containerName2 containerName3
+
+
+    10.新建卷(用于存放 数据库数据和配置)
+    docker volume create mongodb
+    docker volume create mongodb_config
+
+    11.查看卷
+    docker volume ls
+
+    12.创建网络(用于nodejs程序和数据库的通讯)
+    docker network create mongodb
+
+
+
+
+
+
+两个容器之间通讯
+
+    1.启动js程序
+    docker run \
+      -it --rm -d \
+      --network mongodb \     使用同一网络
+      --name ea-container \
+      -p 8000:8000 \
+      -e CONNECTIONSTRING=mongodb://mongodb:27017/yoda_notes \
+      ea-docker
+
+    2.启动数据库
+    docker run -it --rm -d -v mongodb:/data/db \
+      -v mongodb_config:/data/configdb -p 27017:27017 \
+      --network mongodb \    使用同一网络
+      --name mongodb \
+      mongo
+
+
+
+使用docker-compose进行本地开发
+    1. 创建compose文件 docker-compose.dev.yml
+
+
+    docker-compose 超级超级方便
+    可以一键启动多个docker 容器应用
+    暴露9229端口，供调试nodejs
+    映射本地资源与容器资源，本地改变，容器实时改变（nodemon + volumes映射）
+
+    2.构建镜像，并且启动容器
+
+        #up       启动容器
+        #--build  构建镜像
+        #run ea npm run test 启动容器，并执行内部的npm run test 命令
+
+    docker-compose -f docker-compose.dev.yml up --build
+    docker-compose -f docker-compose.dev.yml run ea npm run test
+
+生产单元测试镜像，并且启动运行单元测试
+    docker build -t node-docker --target test .
+    docker run -it --rm -p 8000:8000 node-docker
+
+
+
+CICD
+    1.注册dockerhub 账号，拿到dockerID
+    2.
