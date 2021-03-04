@@ -42,6 +42,7 @@ jobs:
         #自动从网上下载
         uses: docker/login-action@v1
         with:
+          #registry: registry.cn-beijing.aliyuncs.com
           username: ${{ secrets.DOCKER_HUB_DOCKERID }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 

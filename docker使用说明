@@ -1,5 +1,22 @@
 服务器在loop 中运行，等待可能来的请求
 
+账号管理
+    登录
+        1.
+            docker login
+        2.
+            docker login --username=rancheng  registry.cn-beijing.aliyuncs.com
+
+
+
+    创建token（密码的另一种形式，更加安全）
+        docker secret create dockerhubAccessToken token.json
+
+        token.json 的内容
+        {
+          "username":"DockerHubUserName",
+          "password":"DockerHubAccessToken"
+        }
 
 
 镜像
@@ -16,10 +33,18 @@
         docker images
 
     4.给镜像打tag （打第二个tag，一个镜像可以有多个tag）
-        docker tag ea-docker:latest ea-docker:v1.0.0
+        docker tag rancheng/ea-image:latest rancheng/ea-image:v1.0.0
 
     5.删除镜像(如果有多个tag,只是删除了其中一个tag的引用，没有真正删除镜像)
         docker rmi ea-docker:v1.0.0
+
+    6.推送镜像
+        docker push rancheng/ea-image:latest
+
+    7.拉取镜像
+        docker pull rancheng/ea-image:latest
+
+
 容器
     6.启动容器,镜像在容器中运行。(本地无此镜像，先pull,再 run)
 
@@ -142,15 +167,67 @@ CICD
             Now, let’s set up a second GitHub action file to store our latest commit as an image in the GitHub registry. You may want to do this to
 
 
+部署app 到云端（Deploying Docker containers on ECS， 来源地址 https://docs.docker.com/cloud/ecs-integration/）
+
+    1. 方案一（亚马逊EC2 Container Service (ECS) ）
+        好处：
+            从本地开发切换到云端部署
+            使用组合文件进行  多容器应用开发
+
+        需要一个AWS账号
+
+
+
+    2.方案二（阿里云容器服务）
+
+        1.需要支付宝实名认证
+        1.云资源访问授权（Resource Access Management，RAM）
+            阿里云创建不同的角色，每个角色有不同的权限
+
+        2.为角色授权
+
+        3.创建一个docker 集群(相当于在阿里云的机房里找一台机器)
+            选择区域（华北，华南， 选择哪个区域的机房）
+            资源组
+            网络
+            虚拟交换机
+
+
+
+
+
+
+
+
+
+
+
 
 
 正常的 build,push 全流程
-        docker build --tag ea-image:latest  .
+        docker build --tag ea-front:latest  .
 
         #push 之前先打个新标签
-        docker tag ea-image:latest  rancheng/ea-image:latest
+        docker tag ea-front:latest  rancheng/ea-front:v1.0.0
 
         #push之前，先登录。防止报错denied: requested access to the resource is denied
-        docker login --username rancheng --password 159307
+        docker login --username=rancheng https://index.docker.io/v1
 
-        docker push rancheng/ea-image:latest
+        docker push rancheng/ea-front:v1.0.0
+
+push完之后，pull下来
+        docker pull rancheng/ea-front:latest
+
+
+
+
+
+
+
+        docker login --username=rancheng@1166112853771103 --password=Lanhu@2021 registry.cn-beijing.aliyuncs.com
+        docker tag a98380055d03 registry.cn-beijing.aliyuncs.com/lanhu-ea/front:v1.0.0
+        docker push registry.cn-beijing.aliyuncs.com/lanhu-ea/front:v1.0.0
+
+
+
+
