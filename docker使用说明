@@ -38,6 +38,11 @@
     5.删除镜像(如果有多个tag,只是删除了其中一个tag的引用，没有真正删除镜像)
         docker rmi ea-docker:v1.0.0
 
+        删除全部镜像
+        #-q 只返回Id
+        #-a 显示全部
+        docker rmi -f $(docker images -qa)
+
     6.推送镜像
         docker push rancheng/ea-image:latest
 
@@ -70,6 +75,11 @@
 
     8.停止容器,但未删除（容器id, 容器名字）
         docker stop ea-container
+
+        停止全部容器
+        #-q 只返回containerId
+        #-a 显示全部
+        docker stop  $(docker ps -qa)
 
     9.删除容器(可以删除多个容器)
         docker rm ea-container containerName2 containerName3
@@ -135,36 +145,76 @@
 
 
 CICD
-    1.注册dockerhub 账号，拿到dockerID       （相当于dockerhub 用户名）
-    2.在dockerhub 创建Personal Access Token （相当于dockerhub 密码的另一种更安全形式，当登录dockerhub时会用到）
-            进入https://hub.docker.com/settings/security，然后点击New Access Token.
-            注意：token生产后，一定要找地方保存下来。dockerhub只展示一次，否则会丢失
+    1.github(开源仓库，不安全。 推荐用gitlab)
+
+        1.注册dockerhub 账号，拿到dockerID       （相当于dockerhub 用户名）
+        2.在dockerhub 创建Personal Access Token （相当于dockerhub 密码的另一种更安全形式，当登录dockerhub时会用到）
+                进入https://hub.docker.com/settings/security，然后点击New Access Token.
+                注意：token生产后，一定要找地方保存下来。dockerhub只展示一次，否则会丢失
 
 
-            我自己的token   050c59d4-1639-4ad9-a987-1c29f8b1a9d3
+                我自己的token   050c59d4-1639-4ad9-a987-1c29f8b1a9d3
 
-    3.将自己的项目放入github上
+        3.将自己的项目放入github上
 
-    4.github 与 dockerhub 关联
+        4.github 与 dockerhub 关联
 
-        添加dockerID和token 到github项目中(相当于把dockerhub 的用户名和密码 放入了github上)
-        进入你的项目仓库，点击Settings > Secrets > New secret.（创建两个secret,分别存放dockerID和token）
+            添加dockerID和token 到github项目中(相当于把dockerhub 的用户名和密码 放入了github上)
+            进入你的项目仓库，点击Settings > Secrets > New secret.（创建两个secret,分别存放dockerID和token）
 
-        详见 ./github secret.jpeg
-
-
-    5. 设置github actions workflow
-
-        进入你的项目仓库，点击Actions(这里不是settings里的actions) > New workflow.
-        github 生成一个 yml文件（用于配置工作流），写完后，提交到项目中，此文件会存放在.github/workflows目录中
-
-    6. 设置完workflow之后，可以执行命令git push， 然后可以看到github的actions里面有新生成的workflow
+            详见 ./github secret.jpeg
 
 
-    7. 未读完的
-        https://docs.docker.com/language/nodejs/configure-ci-cd/
+        5. 设置github actions workflow
 
-            Now, let’s set up a second GitHub action file to store our latest commit as an image in the GitHub registry. You may want to do this to
+            进入你的项目仓库，点击Actions(这里不是settings里的actions) > New workflow.
+            github 生成一个 yml文件（用于配置工作流），写完后，提交到项目中，此文件会存放在.github/workflows目录中
+
+        6. 设置完workflow之后，可以执行命令git push， 然后可以看到github的actions里面有新生成的workflow
+
+
+        7. 未读完的
+            https://docs.docker.com/language/nodejs/configure-ci-cd/
+
+                Now, let’s set up a second GitHub action file to store our latest commit as an image in the GitHub registry. You may want to do this to
+
+
+    2.gitlab
+        1.新建.gitlab-ci.yml 文件 放入项目根目录。
+        2.push .gitlab-ci.yml 到gitlab 项目内，会触发pipelines,但是此时的job处于pending 状态
+
+            CI->Pipelines
+            使用CI Lint 测试你的.gitlab-ci.yml
+
+            stuck代表没有配置Runner执行这个job
+
+
+
+
+        3.配置一个Runner(本质是一个物理机或虚拟机或容器，用来执行job)
+            注意： runner 不能与 gitlab 在同一台机器上
+
+            按照下面的路径配置runner,可以选择共享runner（可以服务于多个项目）
+            Settings ➔ CI/CD
+
+            1.安装runner到本地 (在 MacOS上)
+                sudo curl --output /usr/local/bin/gitlab-runner "https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-darwin-amd64"
+                sudo chmod +x /usr/local/bin/gitlab-runner
+                cd ~
+                gitlab-runner install
+                gitlab-runner start
+
+
+            2.注册一个runner(本质是将runner与gitlab实例绑定)
+
+                gitlab-runner register
+
+                    然后填入GitLab instance URL
+                        https://gitlab.lanhuapp.com/
+                    在填入token
+                        KGZVzZMnyvP6pv4UchYY
+
+
 
 
 部署app 到云端（Deploying Docker containers on ECS， 来源地址 https://docs.docker.com/cloud/ecs-integration/）
@@ -195,6 +245,11 @@ CICD
 
 
 
+
+docker基础镜像包制作
+    作用：
+        1.优化发布docker镜像
+        2.实现规范，不在各自为战，不在乱哄哄
 
 
 
@@ -227,6 +282,12 @@ push完之后，pull下来
         docker login --username=rancheng@1166112853771103 --password=Lanhu@2021 registry.cn-beijing.aliyuncs.com
         docker tag a98380055d03 registry.cn-beijing.aliyuncs.com/lanhu-ea/front:v1.0.0
         docker push registry.cn-beijing.aliyuncs.com/lanhu-ea/front:v1.0.0
+
+
+
+
+不明白的？？？？？？？？？？？？？
+    docker import - centos6-base
 
 
 
